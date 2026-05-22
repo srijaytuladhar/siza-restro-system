@@ -6,6 +6,7 @@ import '../providers/booking_provider.dart';
 import '../providers/order_provider.dart';
 import '../providers/notification_provider.dart';
 import 'thank_you_screen.dart';
+import '../utils/constants.dart';
 
 class OrderTrackingScreen extends ConsumerStatefulWidget {
   const OrderTrackingScreen({super.key});
@@ -160,7 +161,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${order.items.length} items  •  \$${order.totalAmount.toStringAsFixed(2)}',
+                      '${order.items.length} items  •  ${Constants.currencySymbol}${order.totalAmount.toStringAsFixed(2)}',
                       style: GoogleFonts.outfit(fontSize: 12, color: Colors.white38),
                     ),
                   ],
@@ -260,9 +261,11 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
                 ),
                 if (order.paymentStatus != 'PAID')
                   ElevatedButton.icon(
-                    onPressed: () {
-                      _showPaymentBottomSheet(context, ref, order);
-                    },
+                    onPressed: order.status == OrderStatus.SERVED
+                        ? () {
+                            _showPaymentBottomSheet(context, ref, order);
+                          }
+                        : null,
                     icon: const Icon(Icons.credit_card_rounded, size: 14),
                     label: Text(
                       'Pay Now',
@@ -271,6 +274,8 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.amber,
                       foregroundColor: Colors.black,
+                      disabledBackgroundColor: Colors.white.withOpacity(0.06),
+                      disabledForegroundColor: Colors.white30,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       shape: RoundedRectangleBorder(
@@ -342,7 +347,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
                         style: GoogleFonts.outfit(color: Colors.white70, fontSize: 13),
                       ),
                       Text(
-                        '\$${(item.price * item.quantity).toStringAsFixed(2)}',
+                        '${Constants.currencySymbol}${(item.price * item.quantity).toStringAsFixed(2)}',
                         style: GoogleFonts.outfit(color: Colors.white38, fontSize: 13),
                       ),
                     ],
@@ -538,7 +543,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Order #${order.id}  •  Amount: \$${order.totalAmount.toStringAsFixed(2)}',
+                    'Order #${order.id}  •  Amount: ${Constants.currencySymbol}${order.totalAmount.toStringAsFixed(2)}',
                     style: GoogleFonts.outfit(
                       fontSize: 14,
                       color: Colors.white38,
@@ -647,11 +652,24 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
   }
 
   Future<void> _processMockPayment(BuildContext context, WidgetRef ref, OrderModel order, String method) async {
-    // Show Loading
+    // Show Loading with safety mechanisms to prevent race conditions (spinning loader hangs)
+    BuildContext? dialogContext;
+    bool isDone = false;
+
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator(color: Colors.amber)),
+      builder: (dContext) {
+        dialogContext = dContext;
+        if (isDone) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (dContext.mounted) {
+              Navigator.pop(dContext);
+            }
+          });
+        }
+        return const Center(child: CircularProgressIndicator(color: Colors.amber));
+      },
     );
 
     final success = await ref.read(orderProvider.notifier).processOrderPayment(
@@ -660,8 +678,9 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
       order.totalAmount,
     );
 
-    if (context.mounted) {
-      Navigator.pop(context); // Close loading dialog
+    isDone = true;
+    if (dialogContext != null && dialogContext!.mounted) {
+      Navigator.pop(dialogContext!);
     }
 
     if (success && context.mounted) {
@@ -727,7 +746,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
                   style: GoogleFonts.outfit(color: Colors.white70, fontSize: 13),
                 ),
                 Text(
-                  'Amount: \$${order.totalAmount.toStringAsFixed(2)}',
+                  'Amount: ${Constants.currencySymbol}${order.totalAmount.toStringAsFixed(2)}',
                   style: GoogleFonts.outfit(fontWeight: FontWeight.w800, fontSize: 18, color: Colors.amber),
                 ),
                 const SizedBox(height: 20),

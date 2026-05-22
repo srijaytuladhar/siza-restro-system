@@ -4,7 +4,11 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 class Constants {
   // Replace this with your computer's local IP address (e.g., '192.168.1.5')
   // when testing on a physical mobile device connected to the same Wi-Fi.
-  static const String _localIp = '10.12.101.141'; // Host IP for physical device / network testing
+
+
+  // static const String _localIp = '10.12.101.141'; // Host IP for physical device / network testing
+  static const String _localIp = '192.168.1.92'; // Host IP for physical device / network testing
+  static const String currencySymbol = 'Rs. ';
   
   static String get baseUrl {
     if (kIsWeb) {

@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Base64;
@@ -33,6 +34,7 @@ public class TableService {
     private final TableRepository tableRepository;
     private final TableMapper tableMapper;
     private final BookingRepository bookingRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public List<TableResponse> getAllTables() {
         log.info("Fetching all tables");
@@ -67,6 +69,8 @@ public class TableService {
 
         TableEntity savedTable = tableRepository.save(table);
         log.info("Table created with ID: {} and QR Token: {}", savedTable.getId(), savedTable.getQrCodeToken());
+        
+        messagingTemplate.convertAndSend("/topic/tables", java.util.Collections.singletonMap("status", "updated"));
         return mapToResponseWithQr(savedTable);
     }
 
@@ -85,6 +89,7 @@ public class TableService {
         table.setTableNumber(request.getTableNumber());
         table.setCapacity(request.getCapacity());
         TableEntity updatedTable = tableRepository.save(table);
+        messagingTemplate.convertAndSend("/topic/tables", java.util.Collections.singletonMap("status", "updated"));
         return mapToResponseWithQr(updatedTable);
     }
 
@@ -94,6 +99,7 @@ public class TableService {
         TableEntity table = tableRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Table not found with id: " + id));
         tableRepository.delete(table);
+        messagingTemplate.convertAndSend("/topic/tables", java.util.Collections.singletonMap("status", "updated"));
     }
 
     @Transactional
@@ -111,6 +117,7 @@ public class TableService {
 
         table.setStatus(TableStatus.AVAILABLE);
         TableEntity updatedTable = tableRepository.save(table);
+        messagingTemplate.convertAndSend("/topic/tables", java.util.Collections.singletonMap("status", "updated"));
         return mapToResponseWithQr(updatedTable);
     }
 

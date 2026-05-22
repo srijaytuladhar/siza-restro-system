@@ -6,8 +6,10 @@ import com.sizarestro.entity.*;
 import com.sizarestro.exception.BadRequestException;
 import com.sizarestro.exception.ResourceNotFoundException;
 import com.sizarestro.mapper.PaymentMapper;
+import com.sizarestro.repository.BookingRepository;
 import com.sizarestro.repository.OrderRepository;
 import com.sizarestro.repository.PaymentRepository;
+import com.sizarestro.repository.TableRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -23,6 +25,8 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
+    private final BookingRepository bookingRepository;
+    private final TableRepository tableRepository;
     private final PaymentMapper paymentMapper;
     private final SimpMessagingTemplate messagingTemplate;
 
@@ -48,6 +52,22 @@ public class PaymentService {
         Payment savedPayment = paymentRepository.save(payment);
         order.setPayment(savedPayment);
         orderRepository.save(order);
+
+        // Release table and close booking session on successful payment
+        Booking booking = order.getBooking();
+        if (booking != null && booking.getStatus() == BookingStatus.ACTIVE) {
+            booking.setStatus(BookingStatus.CLOSED);
+            bookingRepository.save(booking);
+            log.info("Closed active booking {} for order {}", booking.getId(), order.getId());
+
+            TableEntity table = booking.getTable();
+            if (table != null) {
+                table.setStatus(TableStatus.AVAILABLE);
+                tableRepository.save(table);
+                log.info("Released table {} (Number: {})", table.getId(), table.getTableNumber());
+                messagingTemplate.convertAndSend("/topic/tables", java.util.Collections.singletonMap("status", "updated"));
+            }
+        }
 
         log.info("Payment processed successfully. Payment ID: {}", savedPayment.getId());
 

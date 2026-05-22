@@ -79,8 +79,16 @@ class OrderNotifier extends StateNotifier<OrderState> {
       // Clear cart on successful order placement
       _ref.read(cartProvider.notifier).clearCart();
       
-      // Prepend or add new order to state list
-      final updatedOrders = List<OrderModel>.from(state.orders)..insert(0, order);
+      // Prepend or add new order to state list if not already present (handles WebSocket/HTTP response race condition)
+      final List<OrderModel> updatedOrders = List<OrderModel>.from(state.orders);
+      if (!updatedOrders.any((o) => o.id == order.id)) {
+        updatedOrders.insert(0, order);
+      } else {
+        final index = updatedOrders.indexWhere((o) => o.id == order.id);
+        if (index != -1) {
+          updatedOrders[index] = order;
+        }
+      }
       state = state.copyWith(orders: updatedOrders, isLoading: false, orderSuccess: true);
       
       // Ensure WebSocket listener is active

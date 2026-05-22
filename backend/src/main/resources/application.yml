@@ -1,6 +1,6 @@
 server:
   port: 8080
-
+#  address: 192.168.56.1
 spring:
   application:
     name: siza-restro-backend

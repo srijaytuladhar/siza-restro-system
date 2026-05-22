@@ -7,6 +7,7 @@ import '../providers/cart_provider.dart';
 import '../providers/menu_provider.dart';
 import 'cart_screen.dart';
 import 'order_tracking_screen.dart';
+import '../utils/constants.dart';
 
 class MenuScreen extends ConsumerStatefulWidget {
   const MenuScreen({super.key});
@@ -207,7 +208,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen> with SingleTickerProvid
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    '\$${cartState.totalAmount.toStringAsFixed(2)}',
+                    '${Constants.currencySymbol}${cartState.totalAmount.toStringAsFixed(2)}',
                     style: GoogleFonts.outfit(fontWeight: FontWeight.w800),
                   ),
                 ],
@@ -281,7 +282,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen> with SingleTickerProvid
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  '\$${item.price.toStringAsFixed(2)}',
+                  '${Constants.currencySymbol}${item.price.toStringAsFixed(2)}',
                   style: GoogleFonts.outfit(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,

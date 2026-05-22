@@ -1,14 +1,17 @@
 import { Injectable } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import SockJS from 'sockjs-client';
-import * as Stomp from 'stompjs/lib/stomp';
+import * as StompModule from 'stompjs/lib/stomp';
+
+const Stomp = (StompModule as any).Stomp || StompModule;
 
 @Injectable({
   providedIn: 'root'
 })
 export class WebsocketService {
-  private stompClient: Stomp.Client | null = null;
+  private stompClient: any = null;
   private messageSubject = new Subject<any>();
+  private tablesSubject = new Subject<any>();
 
   constructor() {
     this.connect();
@@ -22,11 +25,11 @@ export class WebsocketService {
     this.stompClient.debug = () => {};
 
     this.stompClient.connect({}, 
-      (frame) => {
+      (frame: any) => {
         console.log('STOMP Connection Established: ', frame);
         
         // Subscribe to orders topic
-        this.stompClient?.subscribe('/topic/orders', (message) => {
+        this.stompClient?.subscribe('/topic/orders', (message: any) => {
           if (message.body) {
             try {
               const data = JSON.parse(message.body);
@@ -36,8 +39,20 @@ export class WebsocketService {
             }
           }
         });
+
+        // Subscribe to tables topic
+        this.stompClient?.subscribe('/topic/tables', (message: any) => {
+          if (message.body) {
+            try {
+              const data = JSON.parse(message.body);
+              this.tablesSubject.next(data);
+            } catch (e) {
+              console.error('Error parsing WebSocket message body', e);
+            }
+          }
+        });
       }, 
-      (error) => {
+      (error: any) => {
         console.error('STOMP Connection Error, retrying in 5 seconds...', error);
         setTimeout(() => this.connect(), 5000);
       }
@@ -46,5 +61,9 @@ export class WebsocketService {
 
   onOrderUpdate(): Observable<any> {
     return this.messageSubject.asObservable();
+  }
+
+  onTableUpdate(): Observable<any> {
+    return this.tablesSubject.asObservable();
   }
 }

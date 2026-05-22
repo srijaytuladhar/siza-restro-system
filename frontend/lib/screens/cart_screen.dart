@@ -5,6 +5,7 @@ import '../providers/booking_provider.dart';
 import '../providers/cart_provider.dart';
 import '../providers/order_provider.dart';
 import 'order_tracking_screen.dart';
+import '../utils/constants.dart';
 
 class CartScreen extends ConsumerWidget {
   const CartScreen({super.key});
@@ -76,16 +77,16 @@ class CartScreen extends ConsumerWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _buildSummaryRow('Subtotal', '\$${subtotal.toStringAsFixed(2)}'),
+                        _buildSummaryRow('Subtotal', '${Constants.currencySymbol}${subtotal.toStringAsFixed(2)}'),
                         const SizedBox(height: 8),
-                        _buildSummaryRow('VAT (13%)', '\$${tax.toStringAsFixed(2)}'),
+                        _buildSummaryRow('VAT (13%)', '${Constants.currencySymbol}${tax.toStringAsFixed(2)}'),
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 12.0),
                           child: Divider(color: Colors.white10),
                         ),
                         _buildSummaryRow(
                           'Total Amount', 
-                          '\$${grandTotal.toStringAsFixed(2)}',
+                          '${Constants.currencySymbol}${grandTotal.toStringAsFixed(2)}',
                           isBold: true,
                           valueColor: Colors.amber
                         ),
@@ -182,12 +183,12 @@ class CartScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '\$${item.menuItem.price.toStringAsFixed(2)} each',
+                  '${Constants.currencySymbol}${item.menuItem.price.toStringAsFixed(2)} each',
                   style: GoogleFonts.outfit(fontSize: 12, color: Colors.white38),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '\$${itemTotal.toStringAsFixed(2)}',
+                  '${Constants.currencySymbol}${itemTotal.toStringAsFixed(2)}',
                   style: GoogleFonts.outfit(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,

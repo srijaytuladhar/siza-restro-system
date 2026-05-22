@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -6,6 +6,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ApiService, Table } from '../../core/api.service';
+import { WebsocketService } from '../../core/websocket.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-tables',
@@ -519,8 +521,10 @@ import { ApiService, Table } from '../../core/api.service';
     }
   `]
 })
-export class TablesComponent implements OnInit {
+export class TablesComponent implements OnInit, OnDestroy {
   private apiService = inject(ApiService);
+  private websocketService = inject(WebsocketService);
+  private tableSub: Subscription | null = null;
 
   tables: Table[] = [];
   isLoading = true;
@@ -538,11 +542,24 @@ export class TablesComponent implements OnInit {
   selectedTableForQr: Table | null = null;
 
   ngOnInit() {
-    this.loadTables();
+    this.loadTables(true);
+    this.tableSub = this.websocketService.onTableUpdate().subscribe({
+      next: () => {
+        this.loadTables(false);
+      }
+    });
   }
 
-  loadTables() {
-    this.isLoading = true;
+  ngOnDestroy() {
+    if (this.tableSub) {
+      this.tableSub.unsubscribe();
+    }
+  }
+
+  loadTables(showLoader = true) {
+    if (showLoader) {
+      this.isLoading = true;
+    }
     this.apiService.getTables().subscribe({
       next: (data) => {
         // Map status occupied dynamically if backend returns it

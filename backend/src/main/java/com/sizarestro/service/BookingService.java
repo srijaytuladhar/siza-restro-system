@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ public class BookingService {
 
     private final TableRepository tableRepository;
     private final BookingRepository bookingRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional
     public BookingResponse scanAndBookTable(ScanRequest scanRequest) {
@@ -69,6 +71,7 @@ public class BookingService {
         Booking savedBooking = bookingRepository.save(booking);
         log.info("Table {} successfully booked. Booking ID: {}", table.getTableNumber(), savedBooking.getId());
         
+        messagingTemplate.convertAndSend("/topic/tables", java.util.Collections.singletonMap("status", "updated"));
         return mapToResponse(savedBooking);
     }
 
@@ -91,6 +94,8 @@ public class BookingService {
         
         Booking closedBooking = bookingRepository.save(booking);
         log.info("Booking {} closed successfully. Table {} is now AVAILABLE.", bookingId, table.getTableNumber());
+        
+        messagingTemplate.convertAndSend("/topic/tables", java.util.Collections.singletonMap("status", "updated"));
         return mapToResponse(closedBooking);
     }
 
