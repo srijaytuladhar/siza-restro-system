@@ -1,0 +1,72 @@
+# =========================================================================
+# Siza Restro Monorepo Gitignore
+# =========================================================================
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+*.sublime-project
+*.sublime-workspace
+
+# Logs and databases
+*.log
+*.sqlite
+
+# Local Environment / Secrets
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Docker
+.docker/
+
+# =========================================================================
+# Backend Subproject (Maven/Spring Boot)
+# =========================================================================
+backend/target/
+backend/*.jar
+backend/*.war
+backend/*.zip
+backend/*.tar.gz
+backend/.classpath
+backend/.project
+backend/.settings/
+backend/bin/
+
+# =========================================================================
+# Admin Panel Subproject (Angular)
+# =========================================================================
+admin-panel/node_modules/
+admin-panel/dist/
+admin-panel/.angular/
+admin-panel/npm-debug.log*
+admin-panel/yarn-debug.log*
+admin-panel/yarn-error.log*
+admin-panel/.editorconfig
+
+# =========================================================================
+# Frontend Subproject (Flutter/Dart)
+# =========================================================================
+frontend/.dart_tool/
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+frontend/.pub-cache/
+frontend/.pub/
+frontend/build/
+frontend/ios/Flutter/.last_build_id
+frontend/android/app/debug/
+frontend/android/app/profile/
+frontend/android/app/release/
+frontend/app.*.symbols
+frontend/app.*.map.json

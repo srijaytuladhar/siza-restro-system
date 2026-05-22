@@ -1,0 +1,391 @@
+/* Global Styles and Theme Configuration */
+@import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+
+:root {
+  --font-family: 'Outfit', sans-serif;
+  
+  /* Color Palette - Vibrant HSL Purple/Deep Indigo theme */
+  --bg-primary: #0a051b;
+  --bg-secondary: #140e2d;
+  --bg-surface: rgba(26, 19, 57, 0.45);
+  --bg-glass: rgba(20, 14, 45, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #e3dff2;
+  --color-text-muted: #8e83b3;
+  
+  --primary: #9d4edd;
+  --primary-glow: rgba(157, 78, 221, 0.3);
+  --secondary: #3f37c9;
+  --accent: #4cc9f0;
+  
+  /* Status Colors */
+  --color-success: #06d6a0;
+  --color-warning: #ffd166;
+  --color-danger: #ef476f;
+  --color-info: #118ab2;
+  
+  /* Sidebar Width */
+  --sidebar-width: 260px;
+}
+
+/* Light Theme overrides when .light-theme class is active */
+.light-theme {
+  --bg-primary: #f6f5fc;
+  --bg-secondary: #ffffff;
+  --bg-surface: rgba(255, 255, 255, 0.8);
+  --bg-glass: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.06);
+  --glass-shadow: 0 8px 32px 0 rgba(100, 100, 150, 0.1);
+
+  --color-text-primary: #1e1335;
+  --color-text-secondary: #5e507f;
+  --color-text-muted: #8e81ad;
+  
+  --primary: #7209b7;
+  --primary-glow: rgba(114, 9, 183, 0.15);
+  --secondary: #4361ee;
+  --accent: #4cc9f0;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family) !important;
+  background-color: var(--bg-primary);
+  color: var(--color-text-primary);
+  transition: background-color 0.4s ease, color 0.4s ease;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Custom Premium Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* Glassmorphism Card Utility */
+.glass-card {
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow);
+  padding: 24px;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
+}
+
+/* Gradients */
+.primary-gradient {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+}
+
+.glow-text {
+  text-shadow: 0 0 10px var(--primary-glow);
+}
+
+/* Material Override Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family) !important;
+  font-weight: 600;
+}
+
+/* Button Micro-interactions */
+button.btn-premium {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-family: var(--font-family);
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 4px 15px var(--primary-glow);
+  transition: all 0.3s ease;
+}
+
+button.btn-premium:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--primary-glow);
+}
+
+button.btn-premium:active {
+  transform: translateY(1px);
+}
+
+/* Base App Layout Utility */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 30px;
+  background-color: var(--bg-primary);
+  min-height: calc(100vh - 64px);
+  transition: background-color 0.4s ease;
+}
+
+/* Material Table Customizations */
+.mat-mdc-table {
+  background: transparent !important;
+}
+
+.mat-mdc-header-row {
+  background: var(--bg-secondary) !important;
+}
+
+.mat-mdc-row {
+  border-bottom: 1px solid var(--glass-border) !important;
+}
+
+.mat-mdc-header-cell {
+  color: var(--color-text-secondary) !important;
+  font-weight: 600 !important;
+}
+
+.mat-mdc-cell {
+  color: var(--color-text-primary) !important;
+}
+
+/* --- Angular Material Form Controls & Input Styling Overrides --- */
+
+/* Globally target all Material Form Fields */
+.mat-mdc-form-field {
+  color: var(--color-text-primary) !important;
+}
+
+/* Override the label/placeholder text color in all states */
+.mat-mdc-form-field .mdc-floating-label,
+.mat-mdc-form-field .mdc-floating-label span,
+.mat-mdc-form-field .mdc-floating-label * {
+  color: var(--color-text-secondary) !important;
+}
+
+/* Override label color when the field is focused */
+.mat-mdc-form-field.mat-focused .mdc-floating-label,
+.mat-mdc-form-field.mat-focused .mdc-floating-label span,
+.mat-mdc-form-field.mat-focused .mdc-floating-label * {
+  color: var(--primary) !important;
+}
+
+/* Material Input element styling */
+input.mat-mdc-input-element,
+textarea.mat-mdc-input-element {
+  color: var(--color-text-primary) !important;
+  caret-color: var(--primary) !important;
+}
+
+/* Placeholder styling */
+input.mat-mdc-input-element::placeholder,
+textarea.mat-mdc-input-element::placeholder {
+  color: var(--color-text-muted) !important;
+}
+
+/* Prefix and suffix icons/text inside form fields */
+.mat-mdc-form-field .mat-icon,
+.mat-mdc-form-field [matSuffix],
+.mat-mdc-form-field [matPrefix] {
+  color: var(--color-text-secondary) !important;
+}
+
+/* Error states */
+.mat-mdc-form-field .mat-mdc-form-field-error {
+  color: var(--color-danger) !important;
+}
+
+/* Hint states */
+.mat-mdc-form-field .mat-mdc-form-field-hint {
+  color: var(--color-text-muted) !important;
+}
+
+/* Outlined border colors for form fields */
+.mat-mdc-form-field .mdc-notched-outline__leading,
+.mat-mdc-form-field .mdc-notched-outline__notch,
+.mat-mdc-form-field .mdc-notched-outline__trailing {
+  border-color: var(--glass-border) !important;
+}
+
+/* Focused border color */
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: var(--primary) !important;
+  border-width: 2px !important;
+}
+
+/* Hover border color */
+.mat-mdc-form-field:hover:not(.mat-focused) .mdc-notched-outline__leading,
+.mat-mdc-form-field:hover:not(.mat-focused) .mdc-notched-outline__notch,
+.mat-mdc-form-field:hover:not(.mat-focused) .mdc-notched-outline__trailing {
+  border-color: var(--color-text-muted) !important;
+}
+
+/* Input background wrapper */
+.mat-mdc-text-field-wrapper {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+.light-theme .mat-mdc-text-field-wrapper {
+  background-color: rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Dropdown/Select overrides */
+.mat-mdc-select-value {
+  color: var(--color-text-primary) !important;
+}
+
+.mat-mdc-select-placeholder {
+  color: var(--color-text-muted) !important;
+}
+
+.mat-mdc-select-arrow {
+  color: var(--color-text-secondary) !important;
+}
+
+/* Options dropdown container and items */
+.mat-mdc-option {
+  color: var(--color-text-primary) !important;
+  background-color: var(--bg-secondary) !important;
+}
+
+.mat-mdc-option:hover:not(.mdc-list-item--disabled),
+.mat-mdc-option.mat-mdc-option-active {
+  background-color: var(--bg-primary) !important;
+}
+
+.mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+  background-color: rgba(157, 78, 221, 0.15) !important;
+}
+
+/* Option text color inside standard select */
+select.premium-select option {
+  background-color: var(--bg-secondary) !important;
+  color: var(--color-text-primary) !important;
+}
+
+/* Sidenav overrides for text color */
+.mat-drawer {
+  background-color: var(--bg-secondary) !important;
+  color: var(--color-text-primary) !important;
+  border-right: 1px solid var(--glass-border) !important;
+}
+
+/* Cards overrides */
+.mat-mdc-card {
+  background-color: var(--bg-glass) !important;
+  border: 1px solid var(--glass-border) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.mat-mdc-card-title {
+  color: var(--color-text-primary) !important;
+}
+
+.mat-mdc-card-subtitle {
+  color: var(--color-text-secondary) !important;
+}
+
+/* Dialog Container & Content Overrides */
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  background-color: var(--bg-glass) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: var(--glass-shadow) !important;
+}
+
+.mat-mdc-dialog-title {
+  color: var(--color-text-primary) !important;
+}
+
+.mat-mdc-dialog-content {
+  color: var(--color-text-secondary) !important;
+}
+
+.mat-mdc-dialog-actions {
+  border-top-color: var(--glass-border) !important;
+}
+
+/* General HTML Input, Select, and Textarea Global Styling */
+input, select, textarea {
+  color: #ffffff !important;
+  background-color: transparent;
+}
+
+/* --- Sidenav & Navigation List Styling Overrides --- */
+
+/* Navigation links and text inside lists */
+.mat-mdc-list-item,
+.mat-mdc-list-item .mat-mdc-list-item-title,
+.mat-mdc-list-item .mdc-list-item__primary-text,
+.mat-mdc-list-item .mdc-list-item__secondary-text,
+.mat-mdc-list-item-title,
+.mdc-list-item__primary-text,
+.mdc-list-item__secondary-text {
+  color: var(--color-text-secondary) !important;
+}
+
+/* Hover state text color */
+.mat-mdc-list-item:hover .mat-mdc-list-item-title,
+.mat-mdc-list-item:hover .mdc-list-item__primary-text,
+.nav-item:hover .mat-mdc-list-item-title,
+.nav-item:hover .mdc-list-item__primary-text {
+  color: var(--color-text-primary) !important;
+}
+
+/* Icons color in navigation */
+.mat-mdc-list-item mat-icon,
+.mat-mdc-list-item [matListItemIcon] {
+  color: var(--color-text-secondary) !important;
+}
+
+/* Active navigation item styling overrides */
+.nav-item.active-link,
+.nav-item.active-link .mat-mdc-list-item-title,
+.nav-item.active-link .mdc-list-item__primary-text,
+.nav-item.active-link mat-icon,
+.nav-item.active-link .mat-icon {
+  color: #ffffff !important;
+}
+
+/* Sidenav header / logo area overrides */
+.logo-text {
+  color: var(--color-text-primary) !important;
+}
+
+/* Sidenav footer profile overrides */
+.user-details .username {
+  color: var(--color-text-primary) !important;
+}
+
+.user-details .user-role {
+  color: var(--color-text-muted) !important;
+}
