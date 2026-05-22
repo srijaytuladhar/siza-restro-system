@@ -74,6 +74,10 @@ class BookingNotifier extends StateNotifier<BookingState> {
   void clearError() {
     state = state.copyWith(errorMessage: null);
   }
+
+  void reset() {
+    state = BookingState(userId: _generateGuestId());
+  }
 }
 
 final bookingProvider = StateNotifierProvider<BookingNotifier, BookingState>((ref) {

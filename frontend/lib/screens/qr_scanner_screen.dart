@@ -33,12 +33,14 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
     // If the scanned code is a full URL, extract the last segment or parameter
     final Uri? uri = Uri.tryParse(token);
     if (uri != null) {
-      if (uri.pathSegments.isNotEmpty) {
-        token = uri.pathSegments.last;
-      } else {
-        final queryParam = uri.queryParameters['token'] ?? uri.queryParameters['qrCodeToken'];
-        if (queryParam != null) {
-          token = queryParam;
+      final queryParam = uri.queryParameters['token'] ?? uri.queryParameters['qrCodeToken'];
+      if (queryParam != null) {
+        token = queryParam;
+      } else if (uri.pathSegments.isNotEmpty) {
+        // Fallback to last segment if query parameter not found but path exists (e.g. siza-restro://table/scan/token)
+        // Ensure we don't just capture 'scan' as the token if there are no other segments
+        if (uri.pathSegments.last != 'scan' || uri.pathSegments.length > 1) {
+          token = uri.pathSegments.last;
         }
       }
     }

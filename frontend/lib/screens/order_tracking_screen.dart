@@ -5,6 +5,7 @@ import '../models/order_model.dart';
 import '../providers/booking_provider.dart';
 import '../providers/order_provider.dart';
 import '../providers/notification_provider.dart';
+import 'thank_you_screen.dart';
 
 class OrderTrackingScreen extends ConsumerStatefulWidget {
   const OrderTrackingScreen({super.key});
@@ -668,6 +669,12 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
         SnackBar(
           content: Text('Payment processed successfully! Order status updated.', style: GoogleFonts.outfit()),
           backgroundColor: const Color(0xFF2ECC71),
+        ),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const ThankYouScreen(),
         ),
       );
     } else if (context.mounted) {
