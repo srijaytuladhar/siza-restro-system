@@ -317,8 +317,8 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
                   isCompleted: _isStepCompleted(order.status, OrderStatus.READY),
                 ),
                 _buildTimelineStep(
-                  'Served', 
-                  'Enjoy your delicious meal!', 
+                  'Serving', 
+                  'Waiter is on your way.... Enjoy your delicious meal!', 
                   isActive: _isStepActive(order.status, OrderStatus.SERVED),
                   isCompleted: _isStepCompleted(order.status, OrderStatus.SERVED),
                   isLast: true,

@@ -79,17 +79,17 @@ import { Subscription } from 'rxjs';
 
               <div class="card-actions">
                 @if (table.status === 'OCCUPIED') {
-                  <button mat-stroked-button class="btn-icon release" (click)="releaseTable(table.id!)" matTooltip="Release Table">
-                    <mat-icon>lock_open</mat-icon> Release
+                  <button class="btn-icon release" (click)="releaseTable(table.id!)" matTooltip="Release Table">
+                    <mat-icon>lock_open</mat-icon> <span>Release</span>
                   </button>
                 }
-                <button mat-stroked-button class="btn-icon" (click)="viewQrCode(table)" matTooltip="View QR Code">
-                  <mat-icon>qr_code_2</mat-icon> QR Code
+                <button class="btn-icon" (click)="viewQrCode(table)" matTooltip="View QR Code">
+                  <mat-icon>qr_code_2</mat-icon> <span>QR Code</span>
                 </button>
-                <button mat-stroked-button class="btn-icon" (click)="openEditModal(table)" matTooltip="Edit Table">
+                <button class="btn-icon icon-only" (click)="openEditModal(table)" matTooltip="Edit Table">
                   <mat-icon>edit</mat-icon>
                 </button>
-                <button mat-stroked-button class="btn-icon delete" (click)="deleteTable(table.id!)" matTooltip="Delete Table">
+                <button class="btn-icon delete icon-only" (click)="deleteTable(table.id!)" matTooltip="Delete Table">
                   <mat-icon>delete</mat-icon>
                 </button>
               </div>
@@ -309,42 +309,68 @@ import { Subscription } from 'rxjs';
     }
     .card-actions {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       margin-top: 8px;
       border-top: 1px solid var(--glass-border);
       padding-top: 12px;
+      flex-wrap: wrap;
     }
     .btn-icon {
-      height: 36px !important;
-      line-height: 36px !important;
-      padding: 0 10px !important;
-      min-width: 36px !important;
-      border-radius: 6px !important;
-      display: flex;
+      height: 32px;
+      padding: 0 8px;
+      min-width: 32px;
+      border-radius: 6px;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 4px;
-      flex: 1;
-      font-size: 13px !important;
-      color: var(--color-text-secondary) !important;
-      border-color: var(--glass-border) !important;
+      flex: 1 1 auto;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--glass-border);
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .btn-icon mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
     }
     .btn-icon:hover {
-      background: rgba(255, 255, 255, 0.05) !important;
-      color: var(--color-text-primary) !important;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--color-text-primary);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .btn-icon:active {
+      transform: scale(0.97);
+    }
+    .btn-icon.icon-only {
+      flex: 0 0 32px;
+      width: 32px;
+      padding: 0;
+    }
+    .btn-icon.delete {
+      border-color: rgba(239, 71, 111, 0.3);
+      color: var(--color-danger);
+      background: rgba(239, 71, 111, 0.05);
     }
     .btn-icon.delete:hover {
-      border-color: var(--color-danger) !important;
-      color: var(--color-danger) !important;
-      background: rgba(239, 71, 111, 0.05) !important;
+      border-color: var(--color-danger);
+      color: var(--color-danger);
+      background: rgba(239, 71, 111, 0.15);
     }
     .btn-icon.release {
-      border-color: var(--color-success) !important;
-      color: var(--color-success) !important;
+      border-color: rgba(6, 214, 160, 0.3);
+      color: var(--color-success);
+      background: rgba(6, 214, 160, 0.05);
     }
     .btn-icon.release:hover {
-      background: rgba(6, 214, 160, 0.08) !important;
-      color: var(--color-success) !important;
+      background: rgba(6, 214, 160, 0.15);
+      border-color: var(--color-success);
     }
 
     /* Modal Overlay Styles */
