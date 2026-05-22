@@ -7,6 +7,7 @@ import '../providers/cart_provider.dart';
 import '../providers/menu_provider.dart';
 import 'cart_screen.dart';
 import 'order_tracking_screen.dart';
+import 'qr_scanner_screen.dart';
 import '../utils/constants.dart';
 
 class MenuScreen extends ConsumerStatefulWidget {
@@ -34,6 +35,56 @@ class _MenuScreenState extends ConsumerState<MenuScreen> with SingleTickerProvid
     super.dispose();
   }
 
+  Future<bool> _showCancelBookingDialog(BuildContext context, String tableNumber) async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF16161E),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
+            const SizedBox(width: 10),
+            Text(
+              'Cancel Booking?',
+              style: GoogleFonts.outfit(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'Are you sure you want to cancel your booking for $tableNumber? This will release the table and end your active session.',
+          style: GoogleFonts.outfit(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(
+              'Keep Booking',
+              style: GoogleFonts.outfit(color: Colors.amber),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: Text(
+              'Yes, Cancel',
+              style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    ) ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final booking = ref.watch(bookingProvider).activeBooking;
@@ -47,12 +98,33 @@ class _MenuScreenState extends ConsumerState<MenuScreen> with SingleTickerProvid
       return nameMatches || descMatches;
     }).toList();
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF0F0F13),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF16161E),
-        elevation: 0,
-        title: Column(
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+        final tableNum = booking?.tableNumber ?? 'Table';
+        final shouldCancel = await _showCancelBookingDialog(context, tableNum);
+        if (shouldCancel && context.mounted) {
+          await ref.read(bookingProvider.notifier).closeActiveBooking();
+          if (context.mounted && ref.read(bookingProvider).activeBooking == null) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const QrScannerScreen()),
+            );
+          }
+        }
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFF0F0F13),
+        appBar: AppBar(
+          backgroundColor: const Color(0xFF16161E),
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+            tooltip: 'Cancel Booking',
+            onPressed: () => Navigator.maybePop(context),
+          ),
+          title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
@@ -216,6 +288,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen> with SingleTickerProvid
               icon: const Icon(Icons.shopping_basket_rounded),
             )
           : null,
+      ),
     );
   }
 

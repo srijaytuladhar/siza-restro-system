@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -102,207 +103,261 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
     }
   }
 
+  Future<bool> _showExitDialog() async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF16161E),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          'Exit Siza Restro?',
+          style: GoogleFonts.outfit(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to close the app?',
+          style: GoogleFonts.outfit(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.outfit(color: Colors.amber),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.amber[700],
+              foregroundColor: Colors.black,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: Text(
+              'Exit',
+              style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    ) ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final bookingState = ref.watch(bookingProvider);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF0F0F13), // Premium Dark
-      appBar: AppBar(
-        title: Text(
-          'S I Z A   R E S T R O',
-          style: GoogleFonts.outfit(
-            fontWeight: FontWeight.bold,
-            letterSpacing: 2,
-            color: Colors.amber[700],
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+        final shouldExit = await _showExitDialog();
+        if (shouldExit && context.mounted) {
+          SystemNavigator.pop();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFF0F0F13), // Premium Dark
+        appBar: AppBar(
+          title: Text(
+            'S I Z A   R E S T R O',
+            style: GoogleFonts.outfit(
+              fontWeight: FontWeight.bold,
+              letterSpacing: 2,
+              color: Colors.amber[700],
+            ),
           ),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          centerTitle: true,
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'Scan QR to Book Table',
-                style: GoogleFonts.outfit(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'Scan QR to Book Table',
+                  style: GoogleFonts.outfit(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Locate the QR code sticker on your table and aim your camera.',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.outfit(
-                  fontSize: 14,
-                  color: Colors.white70,
+                const SizedBox(height: 8),
+                Text(
+                  'Locate the QR code sticker on your table and aim your camera.',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.outfit(
+                    fontSize: 14,
+                    color: Colors.white70,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 32),
-              
-              // Scanner box container
-              Container(
-                height: 300,
-                width: 300,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.amber.withOpacity(0.3), width: 2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.amber.withOpacity(0.05),
-                      blurRadius: 20,
-                      spreadRadius: 5,
-                    )
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(22),
-                  child: Stack(
-                    children: [
-                      MobileScanner(
-                        controller: _scannerController,
-                        onDetect: (capture) {
-                          final List<Barcode> barcodes = capture.barcodes;
-                          for (final barcode in barcodes) {
-                            if (barcode.rawValue != null) {
-                              _handleQrCode(barcode.rawValue!);
-                              break;
-                            }
-                          }
-                        },
-                      ),
-                      // Scanner Overlay Overlay Grid
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.black.withOpacity(0.5),
-                            width: 30,
-                          ),
-                        ),
-                      ),
-                      // Animated scanning bar
-                      if (bookingState.isLoading)
-                        const Center(
-                          child: CircularProgressIndicator(
-                            color: Colors.amber,
-                          ),
-                        ),
+                const SizedBox(height: 32),
+                
+                // Scanner box container
+                Container(
+                  height: 300,
+                  width: 300,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: Colors.amber.withOpacity(0.3), width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.amber.withOpacity(0.05),
+                        blurRadius: 20,
+                        spreadRadius: 5,
+                      )
                     ],
                   ),
-                ),
-              ),
-              
-              const SizedBox(height: 40),
-              
-              // Divider OR text
-              Row(
-                children: [
-                  Expanded(child: Divider(color: Colors.white.withOpacity(0.1))),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(
-                      'OR MOCK FOR TESTING',
-                      style: GoogleFonts.outfit(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white38,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                  ),
-                  Expanded(child: Divider(color: Colors.white.withOpacity(0.1))),
-                ],
-              ),
-              
-              const SizedBox(height: 24),
-              
-              // Quick Mock buttons
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                alignment: WrapAlignment.center,
-                children: [1, 2, 3].map((tableNum) {
-                  return ElevatedButton(
-                    onPressed: bookingState.isLoading || _isScanned
-                        ? null
-                        : () => _handleQrCode(tableNum.toString()),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white.withOpacity(0.05),
-                      foregroundColor: Colors.amber,
-                      elevation: 0,
-                      side: BorderSide(color: Colors.amber.withOpacity(0.2)),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Text(
-                      'Mock Table $tableNum',
-                      style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
-                    ),
-                  );
-                }).toList(),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Text input mock field
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _mockController,
-                      keyboardType: TextInputType.number,
-                      style: GoogleFonts.outfit(color: Colors.white),
-                      decoration: InputDecoration(
-                        hintText: 'Enter Table ID manually',
-                        hintStyle: GoogleFonts.outfit(color: Colors.white30),
-                        filled: true,
-                        fillColor: Colors.white.withOpacity(0.03),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.white.withOpacity(0.08)),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.amber.withOpacity(0.5)),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  ElevatedButton(
-                    onPressed: bookingState.isLoading || _isScanned
-                        ? null
-                        : () {
-                            if (_mockController.text.trim().isNotEmpty) {
-                              _handleQrCode(_mockController.text.trim());
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(22),
+                    child: Stack(
+                      children: [
+                        MobileScanner(
+                          controller: _scannerController,
+                          onDetect: (capture) {
+                            final List<Barcode> barcodes = capture.barcodes;
+                            for (final barcode in barcodes) {
+                              if (barcode.rawValue != null) {
+                                _handleQrCode(barcode.rawValue!);
+                                break;
+                              }
                             }
                           },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.amber[700],
-                      foregroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Text(
-                      'Submit',
-                      style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+                        ),
+                        // Scanner Overlay Overlay Grid
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.black.withOpacity(0.5),
+                              width: 30,
+                            ),
+                          ),
+                        ),
+                        // Animated scanning bar
+                        if (bookingState.isLoading)
+                          const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.amber,
+                            ),
+                          ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 40),
-            ],
+                ),
+                
+                const SizedBox(height: 40),
+                
+                // Divider OR text
+                Row(
+                  children: [
+                    Expanded(child: Divider(color: Colors.white.withOpacity(0.1))),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Text(
+                        'OR MOCK FOR TESTING',
+                        style: GoogleFonts.outfit(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white38,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                    ),
+                    Expanded(child: Divider(color: Colors.white.withOpacity(0.1))),
+                  ],
+                ),
+                
+                const SizedBox(height: 24),
+                
+                // Quick Mock buttons
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  alignment: WrapAlignment.center,
+                  children: [1, 2, 3].map((tableNum) {
+                    return ElevatedButton(
+                      onPressed: bookingState.isLoading || _isScanned
+                          ? null
+                          : () => _handleQrCode(tableNum.toString()),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white.withOpacity(0.05),
+                        foregroundColor: Colors.amber,
+                        elevation: 0,
+                        side: BorderSide(color: Colors.amber.withOpacity(0.2)),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        'Mock Table $tableNum',
+                        style: GoogleFonts.outfit(fontWeight: FontWeight.w600),
+                      ),
+                    );
+                  }).toList(),
+                ),
+  
+                const SizedBox(height: 20),
+  
+                // Text input mock field
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _mockController,
+                        keyboardType: TextInputType.number,
+                        style: GoogleFonts.outfit(color: Colors.white),
+                        decoration: InputDecoration(
+                          hintText: 'Enter Table ID manually',
+                          hintStyle: GoogleFonts.outfit(color: Colors.white30),
+                          filled: true,
+                          fillColor: Colors.white.withOpacity(0.03),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Colors.white.withOpacity(0.08)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Colors.amber.withOpacity(0.5)),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    ElevatedButton(
+                      onPressed: bookingState.isLoading || _isScanned
+                          ? null
+                          : () {
+                              if (_mockController.text.trim().isNotEmpty) {
+                                _handleQrCode(_mockController.text.trim());
+                              }
+                            },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amber[700],
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        'Submit',
+                        style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 40),
+              ],
+            ),
           ),
         ),
       ),
