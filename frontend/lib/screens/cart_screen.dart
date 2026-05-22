@@ -6,6 +6,8 @@ import '../providers/cart_provider.dart';
 import '../providers/order_provider.dart';
 import 'order_tracking_screen.dart';
 import '../utils/constants.dart';
+import '../widgets/product_image.dart';
+
 
 class CartScreen extends ConsumerWidget {
   const CartScreen({super.key});
@@ -169,8 +171,13 @@ class CartScreen extends ConsumerWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          if (item.menuItem.imageUrl != null && item.menuItem.imageUrl!.trim().isNotEmpty) ...[
+            ProductImage(imageUrl: item.menuItem.imageUrl, size: 60),
+            const SizedBox(width: 16),
+          ],
           Expanded(
             child: Column(
+
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(

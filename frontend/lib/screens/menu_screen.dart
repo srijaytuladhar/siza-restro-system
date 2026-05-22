@@ -9,6 +9,8 @@ import 'cart_screen.dart';
 import 'order_tracking_screen.dart';
 import 'qr_scanner_screen.dart';
 import '../utils/constants.dart';
+import '../widgets/product_image.dart';
+
 
 class MenuScreen extends ConsumerStatefulWidget {
   const MenuScreen({super.key});
@@ -330,9 +332,14 @@ class _MenuScreenState extends ConsumerState<MenuScreen> with SingleTickerProvid
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (item.imageUrl != null && item.imageUrl!.trim().isNotEmpty) ...[
+            ProductImage(imageUrl: item.imageUrl, size: 80),
+            const SizedBox(width: 16),
+          ],
           // Info Column
           Expanded(
             child: Column(
+
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
