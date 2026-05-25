@@ -2,35 +2,43 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class Constants {
-  // Replace this with your computer's local IP address (e.g., '192.168.1.5')
-  // when testing on a physical mobile device connected to the same Wi-Fi.
-
-
-  // static const String _localIp = '10.12.101.141'; // Host IP for physical device / network testing
-  static const String _localIp = '192.168.1.92'; // Host IP for physical device / network testing
   static const String currencySymbol = 'Rs. ';
   
+  static String? _customBaseUrl;
+
+  static void setBaseUrl(String domain) {
+    String url = domain.trim();
+    if (url.endsWith('/')) {
+      url = url.substring(0, url.length - 1);
+    }
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'http://$url';
+    }
+    _customBaseUrl = url;
+  }
+
   static String get baseUrl {
+    if (_customBaseUrl != null && _customBaseUrl!.isNotEmpty) {
+      return _customBaseUrl!;
+    }
     if (kIsWeb) {
       return 'http://localhost:8080';
     }
     try {
       if (Platform.isAndroid) {
-        return 'http://$_localIp:8080';
+        return 'http://10.0.2.2:8080';
       }
     } catch (_) {}
     return 'http://localhost:8080';
   }
 
   static String get wsUrl {
-    if (kIsWeb) {
-      return 'ws://localhost:8080/ws';
+    final base = baseUrl;
+    if (base.startsWith('https://')) {
+      return '${base.replaceFirst('https://', 'wss://')}/ws';
+    } else if (base.startsWith('http://')) {
+      return '${base.replaceFirst('http://', 'ws://')}/ws';
     }
-    try {
-      if (Platform.isAndroid) {
-        return 'ws://$_localIp:8080/ws';
-      }
-    } catch (_) {}
     return 'ws://localhost:8080/ws';
   }
 }

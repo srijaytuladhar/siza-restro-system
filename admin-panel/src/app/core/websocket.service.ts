@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import SockJS from 'sockjs-client';
 import * as StompModule from 'stompjs/lib/stomp';
+import { ApiService } from './api.service';
 
 const Stomp = (StompModule as any).Stomp || StompModule;
 
@@ -13,12 +14,14 @@ export class WebsocketService {
   private messageSubject = new Subject<any>();
   private tablesSubject = new Subject<any>();
 
-  constructor() {
+  constructor(private apiService: ApiService) {
     this.connect();
   }
 
   private connect() {
-    const socket = new SockJS('http://localhost:8080/ws');
+    const apiBase = (this.apiService as any).baseUrl || 'http://localhost:8080/api';
+    const wsUrl = apiBase.replace(/\/api$/, '/ws');
+    const socket = new SockJS(wsUrl);
     this.stompClient = Stomp.over(socket);
     
     // Silence debug logs in production/runtime console

@@ -1,18 +1,36 @@
-  import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'utils/constants.dart';
 import 'screens/qr_scanner_screen.dart';
+import 'screens/backend_config_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  final prefs = await SharedPreferences.getInstance();
+  final savedDomain = prefs.getString('backend_domain');
+  
+  Widget initialScreen;
+  if (savedDomain != null && savedDomain.isNotEmpty) {
+    Constants.setBaseUrl(savedDomain);
+    initialScreen = const QrScannerScreen();
+  } else {
+    initialScreen = const BackendConfigScreen();
+  }
+
   runApp(
-    const ProviderScope(
-      child: SizaRestroApp(),
+    ProviderScope(
+      child: SizaRestroApp(initialScreen: initialScreen),
     ),
   );
 }
 
 class SizaRestroApp extends StatelessWidget {
-  const SizaRestroApp({super.key});
+  final Widget initialScreen;
+
+  const SizaRestroApp({super.key, required this.initialScreen});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +52,7 @@ class SizaRestroApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const QrScannerScreen(),
+      home: initialScreen,
     );
   }
 }

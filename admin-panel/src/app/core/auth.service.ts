@@ -13,8 +13,8 @@ export interface AuthResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/api/auth';
-  
+  private apiUrl = 'https://dec-decided-phil-whom.trycloudflare.com/api/auth';
+
   currentUser = signal<{ username: string; role: string } | null>(null);
   isLoggedIn = computed(() => this.currentUser() !== null);
 

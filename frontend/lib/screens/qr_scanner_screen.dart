@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../providers/booking_provider.dart';
+import '../providers/api_providers.dart';
 import 'booking_confirmation_screen.dart';
+import 'backend_config_screen.dart';
 
 class QrScannerScreen extends ConsumerStatefulWidget {
   const QrScannerScreen({super.key});
@@ -174,6 +176,23 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           centerTitle: true,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings_outlined, color: Colors.white70),
+              tooltip: 'Configure Server Connection',
+              onPressed: () async {
+                final updated = await Navigator.push<bool>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const BackendConfigScreen(isEditing: true),
+                  ),
+                );
+                if (updated == true && mounted) {
+                  ref.invalidate(apiServiceProvider);
+                }
+              },
+            ),
+          ],
         ),
         body: SingleChildScrollView(
           child: Padding(
