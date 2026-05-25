@@ -93,6 +93,21 @@ class _MenuScreenState extends ConsumerState<MenuScreen> with SingleTickerProvid
     final menuState = ref.watch(menuProvider);
     final cartState = ref.watch(cartProvider);
 
+    // Guard: If booking is null, redirect to scanner
+    if (booking == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const QrScannerScreen()),
+          (route) => false,
+        );
+      });
+      return const Scaffold(
+        backgroundColor: Color(0xFF0F0F13),
+        body: Center(child: CircularProgressIndicator(color: Colors.amber)),
+      );
+    }
+
     // Filter items based on query
     List<MenuItemModel> filteredItems = menuState.items.where((item) {
       final nameMatches = item.name.toLowerCase().contains(_searchQuery.toLowerCase());
@@ -104,7 +119,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen> with SingleTickerProvid
       canPop: false,
       onPopInvoked: (didPop) async {
         if (didPop) return;
-        final tableNum = booking?.tableNumber ?? 'Table';
+        final tableNum = booking.tableNumber;
         final shouldCancel = await _showCancelBookingDialog(context, tableNum);
         if (shouldCancel && context.mounted) {
           await ref.read(bookingProvider.notifier).closeActiveBooking();
@@ -137,15 +152,14 @@ class _MenuScreenState extends ConsumerState<MenuScreen> with SingleTickerProvid
                 color: Colors.white,
               ),
             ),
-            if (booking != null)
-              Text(
-                booking.tableNumber,
-                style: GoogleFonts.outfit(
-                  fontSize: 12,
-                  color: Colors.amber,
-                  fontWeight: FontWeight.w600,
-                ),
+            Text(
+              booking.tableNumber,
+              style: GoogleFonts.outfit(
+                fontSize: 12,
+                color: Colors.amber,
+                fontWeight: FontWeight.w600,
               ),
+            ),
           ],
         ),
         actions: [
